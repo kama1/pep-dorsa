@@ -241,7 +241,7 @@ export class PepDorsa {
             if (res.data && res.data.resultCode === 0) {
                 return res.data.data;
             } else {
-                this.throwError('Purchase', res.data);
+                this.throwError('Confirm', res.data);
             }
         } catch (error) {
             return Promise.reject(error);
