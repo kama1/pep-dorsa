@@ -1,0 +1,25 @@
+{
+  "name": "pep-dorsa",
+  "version": "1.0.0",
+  "description": "Pasargad Electronic Payment Dorsa Version",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Kamal Rahmati",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kama1/pep-dorsa.git"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "axios": "^1.13.2"
+  }
+}
