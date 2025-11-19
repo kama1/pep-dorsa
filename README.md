@@ -89,7 +89,7 @@ Pay utility bills:
 ```typescript
 const billResult = await pepClient.bill({
   invoice: 'INV-003',
-  invoiceDate: '2024-01-15',
+  invoiceDate: '1404/08/28',
   amount: 50000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
@@ -108,7 +108,7 @@ import { Operator } from 'pep-dorsa';
 
 const chargeResult = await pepClient.directCharge({
   invoice: 'INV-004',
-  invoiceDate: '2024-01-15',
+  invoiceDate: '1404/08/28',
   amount: 20000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
@@ -124,7 +124,7 @@ Purchase mobile charge PIN codes:
 ```typescript
 const pinResult = await pepClient.pinCharge({
   invoice: 'INV-005',
-  invoiceDate: '2024-01-15',
+  invoiceDate: '1404/08/28',
   amount: 100000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
@@ -141,12 +141,12 @@ Purchase internet data packages:
 ```typescript
 const internetResult = await pepClient.internetCharge({
   invoice: 'INV-006',
-  invoiceDate: '2024-01-15',
+  invoiceDate: '1404/08/28',
   amount: 30000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
   operator: Operator.MCI,
-  productCode: 'PKG001',
+  productCode: '95017',
   description: 'Internet package purchase'
 });
 ```
