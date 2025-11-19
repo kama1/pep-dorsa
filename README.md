@@ -104,7 +104,7 @@ const billResult = await pepClient.bill({
 Directly charge a mobile number:
 
 ```typescript
-import { Operator } from 'pep-dorsa';
+import { MobileOperator } from 'pep-dorsa';
 
 const chargeResult = await pepClient.directCharge({
   invoice: 'INV-004',
@@ -112,7 +112,7 @@ const chargeResult = await pepClient.directCharge({
   amount: 20000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
-  operator: Operator.MCI, // or Operator.MTN, Operator.RTL
+  operator: MobileOperator.MCI, // or MobileOperator.MTN, MobileOperator.RTL
   description: 'Mobile charge'
 });
 ```
@@ -128,7 +128,7 @@ const pinResult = await pepClient.pinCharge({
   amount: 100000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
-  operator: Operator.MTN,
+  operator: MobileOperator.MTN,
   count: 5, // Number of PIN codes
   description: 'PIN charge purchase'
 });
@@ -145,7 +145,7 @@ const internetResult = await pepClient.internetCharge({
   amount: 30000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
-  operator: Operator.MCI,
+  operator: MobileOperator.MCI,
   productCode: '95017',
   description: 'Internet package purchase'
 });

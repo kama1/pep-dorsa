@@ -60,7 +60,7 @@ export interface BillRequest {
     paymentId: string
 }
 
-export enum Operator {
+export enum MobileOperator {
     MCI,
     MTN,
     RTL,
@@ -72,7 +72,7 @@ export interface DirectChargeRequest {
     amount: number;
     callbackApi: string;
     mobileNumber: string;
-    operator: Operator;
+    operator: MobileOperator;
     description?: string;
     payerMail?: string;
     payerName?: string;
@@ -86,7 +86,7 @@ export interface PinChargeRequest {
     amount: number;
     callbackApi: string;
     mobileNumber: string;
-    operator: Operator;
+    operator: MobileOperator;
     description?: string;
     payerMail?: string;
     payerName?: string;
@@ -101,7 +101,7 @@ export interface InternetChargeRequest {
     amount: number;
     callbackApi: string;
     mobileNumber: string;
-    operator: Operator;
+    operator: MobileOperator;
     description?: string;
     payerMail?: string;
     payerName?: string;
@@ -364,13 +364,13 @@ export class PepDorsa {
             const token = await this.authenticate();
             let serviceCode;
             switch (operator) {
-                case Operator.MCI:
+                case MobileOperator.MCI:
                     serviceCode = '1';
                     break;
-                case Operator.MTN:
+                case MobileOperator.MTN:
                     serviceCode = '2';
                     break;
-                case Operator.RTL:
+                case MobileOperator.RTL:
                     serviceCode = '3';
                     break;
 
@@ -428,13 +428,13 @@ export class PepDorsa {
             const token = await this.authenticate();
             let serviceCode;
             switch (operator) {
-                case Operator.MCI:
+                case MobileOperator.MCI:
                     serviceCode = '5';
                     break;
-                case Operator.MTN:
+                case MobileOperator.MTN:
                     serviceCode = '6';
                     break;
-                case Operator.RTL:
+                case MobileOperator.RTL:
                     serviceCode = '7';
                     break;
 
@@ -493,13 +493,13 @@ export class PepDorsa {
             const token = await this.authenticate();
             let serviceCode;
             switch (operator) {
-                case Operator.MCI:
+                case MobileOperator.MCI:
                     serviceCode = '1';
                     break;
-                case Operator.MTN:
+                case MobileOperator.MTN:
                     serviceCode = '2';
                     break;
-                case Operator.RTL:
+                case MobileOperator.RTL:
                     serviceCode = '3';
                     break;
 
