@@ -7,7 +7,11 @@ A TypeScript/Node.js client library for integrating with Pasargad Electronic Pay
 - 🔐 Automatic token management with caching
 - 💳 Standard purchase transactions
 - 🏦 Multi-account purchase support
-- ✅ Transaction confirmation
+- 📱 Mobile charge services (direct, PIN-based)
+- 🌐 Internet package charge
+- 🧾 Bill payment support
+- ✅ Transaction confirmation and verification
+- 🔄 Transaction reversal
 - 📝 Full TypeScript support with type definitions
 - ⚡ Promise-based async/await API
 
@@ -78,6 +82,75 @@ const multiAccResult = await pepClient.multiAccPurchase({
 });
 ```
 
+### Bill Payment
+
+Pay utility bills:
+
+```typescript
+const billResult = await pepClient.bill({
+  invoice: 'INV-003',
+  invoiceDate: '2024-01-15',
+  amount: 50000,
+  callbackApi: 'https://yoursite.com/payment/callback',
+  mobileNumber: '09123456789',
+  billId: '1234567890123',
+  paymentId: '98765',
+  description: 'Electricity bill payment'
+});
+```
+
+### Mobile Direct Charge
+
+Directly charge a mobile number:
+
+```typescript
+import { Operator } from 'pep-dorsa';
+
+const chargeResult = await pepClient.directCharge({
+  invoice: 'INV-004',
+  invoiceDate: '2024-01-15',
+  amount: 20000,
+  callbackApi: 'https://yoursite.com/payment/callback',
+  mobileNumber: '09123456789',
+  operator: Operator.MCI, // or Operator.MTN, Operator.RTL
+  description: 'Mobile charge'
+});
+```
+
+### Mobile PIN Charge
+
+Purchase mobile charge PIN codes:
+
+```typescript
+const pinResult = await pepClient.pinCharge({
+  invoice: 'INV-005',
+  invoiceDate: '2024-01-15',
+  amount: 100000,
+  callbackApi: 'https://yoursite.com/payment/callback',
+  mobileNumber: '09123456789',
+  operator: Operator.MTN,
+  count: 5, // Number of PIN codes
+  description: 'PIN charge purchase'
+});
+```
+
+### Internet Package Charge
+
+Purchase internet data packages:
+
+```typescript
+const internetResult = await pepClient.internetCharge({
+  invoice: 'INV-006',
+  invoiceDate: '2024-01-15',
+  amount: 30000,
+  callbackApi: 'https://yoursite.com/payment/callback',
+  mobileNumber: '09123456789',
+  operator: Operator.MCI,
+  productCode: 'PKG001',
+  description: 'Internet package purchase'
+});
+```
+
 ### Confirm Transaction
 
 After the user completes payment and returns to your callback URL, confirm the transaction:
@@ -92,6 +165,28 @@ console.log(confirmation.referenceNumber);
 console.log(confirmation.trackId);
 console.log(confirmation.maskedCardNumber);
 console.log(confirmation.amount);
+```
+
+### Verify Transaction
+
+Verify a transaction status:
+
+```typescript
+const verification = await pepClient.verify({
+  invoice: 'INV-001',
+  urlId: 'url-id-from-purchase-response'
+});
+```
+
+### Reverse Transaction
+
+Reverse a transaction:
+
+```typescript
+const reversal = await pepClient.reverse({
+  invoice: 'INV-001',
+  urlId: 'url-id-from-purchase-response'
+});
 ```
 
 ## API Reference
