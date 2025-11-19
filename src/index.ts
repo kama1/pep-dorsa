@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-interface Config {
+export interface Config {
     baseUrl: string
     terminalNumber: number
     username: string
     password: string
 }
 
-interface PurchaseRequest {
+export interface PurchaseRequest {
     invoice: string;
     invoiceDate: string;
     amount: number;
@@ -21,7 +21,7 @@ interface PurchaseRequest {
     paymentCode?: string
 }
 
-interface MultiAccPurchaseRequest {
+export interface MultiAccPurchaseRequest {
     invoice: string;
     invoiceDate: string;
     amount: number;
@@ -36,7 +36,7 @@ interface MultiAccPurchaseRequest {
     nationalCode?: string;
 }
 
-interface PurchaseResponse {
+export interface PurchaseResponse {
     resultMsg: string;
     resultCode: number;
     data: {
@@ -45,7 +45,7 @@ interface PurchaseResponse {
     };
 }
 
-interface BillRequest {
+export interface BillRequest {
     invoice: string;
     invoiceDate: string;
     amount: number;
@@ -60,13 +60,13 @@ interface BillRequest {
     paymentId: string
 }
 
-enum Operator {
+export enum Operator {
     MCI,
     MTN,
     RTL,
 }
 
-interface DirectChargeRequest {
+export interface DirectChargeRequest {
     invoice: string;
     invoiceDate: string;
     amount: number;
@@ -80,7 +80,7 @@ interface DirectChargeRequest {
     nationalCode?: string;
 }
 
-interface PinChargeRequest {
+export interface PinChargeRequest {
     invoice: string;
     invoiceDate: string;
     amount: number;
@@ -95,7 +95,7 @@ interface PinChargeRequest {
     count: number;
 }
 
-interface InternetChargeRequest {
+export interface InternetChargeRequest {
     invoice: string;
     invoiceDate: string;
     amount: number;
@@ -110,18 +110,18 @@ interface InternetChargeRequest {
     productCode: string;
 }
 
-interface PreTransactionResponse {
+export interface SimpleResponse {
     resultMsg: string;
     resultCode: number;
     data: string;
 }
 
-interface ConfirmRequest {
+export interface PaymentRequest {
     invoice: string;
     urlId: string;
 }
 
-interface ConfirmResponse {
+export interface ConfirmResponse {
     resultMsg: string;
     resultCode: number;
     data: {
@@ -133,6 +133,11 @@ interface ConfirmResponse {
         requestDate: string,
         amount: number,
     };
+}
+
+export interface ReverseResponse {
+    resultMsg: string;
+    resultCode: number;
 }
 
 export class PepDorsa {
@@ -307,7 +312,7 @@ export class PepDorsa {
     }: BillRequest): Promise<any> {
         try {
             const token = await this.authenticate();
-            const res = await axios.post<PreTransactionResponse>(
+            const res = await axios.post<SimpleResponse>(
                 `${this.config.baseUrl}/api/payment/pre-transaction`,
                 {
                     invoice,
@@ -372,7 +377,7 @@ export class PepDorsa {
                 default:
                     break;
             }
-            const res = await axios.post<PreTransactionResponse>(
+            const res = await axios.post<SimpleResponse>(
                 `${this.config.baseUrl}/api/payment/pre-transaction`,
                 {
                     invoice,
@@ -436,7 +441,7 @@ export class PepDorsa {
                 default:
                     break;
             }
-            const res = await axios.post<PreTransactionResponse>(
+            const res = await axios.post<SimpleResponse>(
                 `${this.config.baseUrl}/api/payment/pre-transaction`,
                 {
                     invoice,
@@ -501,7 +506,7 @@ export class PepDorsa {
                 default:
                     break;
             }
-            const res = await axios.post<PreTransactionResponse>(
+            const res = await axios.post<SimpleResponse>(
                 `${this.config.baseUrl}/api/payment/pre-transaction`,
                 {
                     invoice,
@@ -538,7 +543,7 @@ export class PepDorsa {
     async confirm({
         invoice,
         urlId,
-    }: ConfirmRequest): Promise<any> {
+    }: PaymentRequest): Promise<any> {
         try {
             const token = await this.authenticate();
             const res = await axios.post<ConfirmResponse>(
@@ -562,4 +567,89 @@ export class PepDorsa {
             return Promise.reject(error);
         }
     }
+
+    async verifyTransaction({
+        invoice,
+        urlId,
+    }: PaymentRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            const res = await axios.post<SimpleResponse>(
+                `${this.config.baseUrl}/api/payment/verify-transactions`,
+                {
+                    invoice,
+                    urlId
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data;
+            } else {
+                this.throwError('Verify', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async verify({
+        invoice,
+        urlId,
+    }: PaymentRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            const res = await axios.post<ConfirmResponse>(
+                `${this.config.baseUrl}/api/payment/verify-payment`,
+                {
+                    invoice,
+                    urlId
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data;
+            } else {
+                this.throwError('Confirm', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async reverse({
+        invoice,
+        urlId,
+    }: PaymentRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            const res = await axios.post<ReverseResponse>(
+                `${this.config.baseUrl}/api/payment/reverse-transactions`,
+                {
+                    invoice,
+                    urlId
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data;
+            } else {
+                this.throwError('Reverse', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
 }
