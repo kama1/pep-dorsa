@@ -24,6 +24,11 @@ npm install pep-dorsa
 ```typescript
 import { PepDorsa } from 'pep-dorsa';
 
+// or
+
+const { PepDorsa } = require('pep-dorsa');
+
+
 const pepClient = new PepDorsa({
   baseUrl: 'https://pep.shaparak.ir/dorsa1',
   terminalNumber: 12345678,
