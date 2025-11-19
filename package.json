@@ -1,11 +1,17 @@
 {
   "name": "pep-dorsa",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Pasargad Electronic Payment Dorsa Version",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "pasargad",
+    "pep",
+    "dorsa",
+    "iran"
   ],
   "scripts": {
     "build": "tsc"
