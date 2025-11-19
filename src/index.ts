@@ -45,6 +45,27 @@ interface PurchaseResponse {
     };
 }
 
+interface BillRequest {
+    invoice: string;
+    invoiceDate: string;
+    amount: number;
+    callbackApi: string;
+    mobileNumber: string;
+    description?: string;
+    payerMail?: string;
+    payerName?: string;
+    pans?: string[];
+    nationalCode?: string;
+    billId: string;
+    paymentId: string
+}
+
+interface BillResponse {
+    resultMsg: string;
+    resultCode: number;
+    data: string;
+}
+
 interface ConfirmRequest {
     invoice: string;
     urlId: string;
@@ -214,6 +235,57 @@ export class PepDorsa {
                 return res.data.data;
             } else {
                 this.throwError('MultiAccPurchase', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async bill({
+        invoice,
+        invoiceDate,
+        amount,
+        callbackApi,
+        mobileNumber,
+        description,
+        payerMail,
+        payerName,
+        pans,
+        nationalCode,
+        billId,
+        paymentId
+    }: BillRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            const res = await axios.post<BillResponse>(
+                `${this.config.baseUrl}/api/payment/pre-transaction`,
+                {
+                    invoice,
+                    invoiceDate,
+                    amount,
+                    mobileNumber,
+                    callbackApi,
+                    terminalNumber: this.config.terminalNumber,
+                    serviceCode: '4',
+                    serviceType: 'BILL',
+                    description,
+                    payerMail,
+                    payerName,
+                    pans,
+                    nationalCode,
+                    billId,
+                    paymentId
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data.data;
+            } else {
+                this.throwError('Purchase', res.data);
             }
         } catch (error) {
             return Promise.reject(error);
