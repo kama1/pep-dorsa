@@ -39,7 +39,7 @@ Create a payment request and redirect the user to the payment gateway:
 ```typescript
 const purchaseResult = await pepClient.purchase({
   invoice: 'INV-001',
-  invoiceDate: '2024-01-15',
+  invoiceDate: '1404/08/28',
   amount: 100000, // Amount in Rials
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
