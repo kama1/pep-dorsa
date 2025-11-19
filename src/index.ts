@@ -60,7 +60,57 @@ interface BillRequest {
     paymentId: string
 }
 
-interface BillResponse {
+enum Operator {
+    MCI,
+    MTN,
+    RTL,
+}
+
+interface DirectChargeRequest {
+    invoice: string;
+    invoiceDate: string;
+    amount: number;
+    callbackApi: string;
+    mobileNumber: string;
+    operator: Operator;
+    description?: string;
+    payerMail?: string;
+    payerName?: string;
+    pans?: string[];
+    nationalCode?: string;
+}
+
+interface PinChargeRequest {
+    invoice: string;
+    invoiceDate: string;
+    amount: number;
+    callbackApi: string;
+    mobileNumber: string;
+    operator: Operator;
+    description?: string;
+    payerMail?: string;
+    payerName?: string;
+    pans?: string[];
+    nationalCode?: string;
+    count: number;
+}
+
+interface InternetChargeRequest {
+    invoice: string;
+    invoiceDate: string;
+    amount: number;
+    callbackApi: string;
+    mobileNumber: string;
+    operator: Operator;
+    description?: string;
+    payerMail?: string;
+    payerName?: string;
+    pans?: string[];
+    nationalCode?: string;
+    productCode: string;
+}
+
+interface PreTransactionResponse {
     resultMsg: string;
     resultCode: number;
     data: string;
@@ -257,7 +307,7 @@ export class PepDorsa {
     }: BillRequest): Promise<any> {
         try {
             const token = await this.authenticate();
-            const res = await axios.post<BillResponse>(
+            const res = await axios.post<PreTransactionResponse>(
                 `${this.config.baseUrl}/api/payment/pre-transaction`,
                 {
                     invoice,
@@ -285,7 +335,200 @@ export class PepDorsa {
             if (res.data && res.data.resultCode === 0) {
                 return res.data.data;
             } else {
-                this.throwError('Purchase', res.data);
+                this.throwError('Bill', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async directCharge({
+        invoice,
+        invoiceDate,
+        amount,
+        callbackApi,
+        mobileNumber,
+        operator,
+        description,
+        payerMail,
+        payerName,
+        pans,
+        nationalCode,
+    }: DirectChargeRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            let serviceCode;
+            switch (operator) {
+                case Operator.MCI:
+                    serviceCode = '1';
+                    break;
+                case Operator.MTN:
+                    serviceCode = '2';
+                    break;
+                case Operator.RTL:
+                    serviceCode = '3';
+                    break;
+
+                default:
+                    break;
+            }
+            const res = await axios.post<PreTransactionResponse>(
+                `${this.config.baseUrl}/api/payment/pre-transaction`,
+                {
+                    invoice,
+                    invoiceDate,
+                    amount,
+                    mobileNumber,
+                    callbackApi,
+                    terminalNumber: this.config.terminalNumber,
+                    serviceCode,
+                    serviceType: operator.toString(),
+                    description,
+                    payerMail,
+                    payerName,
+                    pans,
+                    nationalCode,
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data.data;
+            } else {
+                this.throwError('Direct Charge', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async pinCharge({
+        invoice,
+        invoiceDate,
+        amount,
+        callbackApi,
+        mobileNumber,
+        operator,
+        description,
+        payerMail,
+        payerName,
+        pans,
+        nationalCode,
+        count,
+    }: PinChargeRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            let serviceCode;
+            switch (operator) {
+                case Operator.MCI:
+                    serviceCode = '5';
+                    break;
+                case Operator.MTN:
+                    serviceCode = '6';
+                    break;
+                case Operator.RTL:
+                    serviceCode = '7';
+                    break;
+
+                default:
+                    break;
+            }
+            const res = await axios.post<PreTransactionResponse>(
+                `${this.config.baseUrl}/api/payment/pre-transaction`,
+                {
+                    invoice,
+                    invoiceDate,
+                    amount,
+                    mobileNumber,
+                    callbackApi,
+                    terminalNumber: this.config.terminalNumber,
+                    serviceCode,
+                    serviceType: operator.toString() + '-PIN',
+                    description,
+                    payerMail,
+                    payerName,
+                    pans,
+                    nationalCode,
+                    count,
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data.data;
+            } else {
+                this.throwError('PIN Charge', res.data);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async internetCharge({
+        invoice,
+        invoiceDate,
+        amount,
+        callbackApi,
+        mobileNumber,
+        operator,
+        description,
+        payerMail,
+        payerName,
+        pans,
+        nationalCode,
+        productCode,
+    }: InternetChargeRequest): Promise<any> {
+        try {
+            const token = await this.authenticate();
+            let serviceCode;
+            switch (operator) {
+                case Operator.MCI:
+                    serviceCode = '1';
+                    break;
+                case Operator.MTN:
+                    serviceCode = '2';
+                    break;
+                case Operator.RTL:
+                    serviceCode = '3';
+                    break;
+
+                default:
+                    break;
+            }
+            const res = await axios.post<PreTransactionResponse>(
+                `${this.config.baseUrl}/api/payment/pre-transaction`,
+                {
+                    invoice,
+                    invoiceDate,
+                    amount,
+                    mobileNumber,
+                    callbackApi,
+                    terminalNumber: this.config.terminalNumber,
+                    serviceCode,
+                    serviceType: operator.toString(),
+                    description,
+                    payerMail,
+                    payerName,
+                    pans,
+                    nationalCode,
+                    productCode,
+                },
+                {
+                    headers: this.getHeaders(token),
+                    timeout: 15000,
+                }
+            );
+
+            if (res.data && res.data.resultCode === 0) {
+                return res.data.data;
+            } else {
+                this.throwError('Internet Charge', res.data);
             }
         } catch (error) {
             return Promise.reject(error);
