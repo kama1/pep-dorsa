@@ -190,6 +190,9 @@ const reversal = await pepClient.reverse({
 ```
 
 ## API Reference
+### Overview
+
+The library exports a typed client `PepDorsa` and several request/response interfaces to interact with the PEP Dorsa payment API. All methods are async and return Promises that reject on error.
 
 ### Constructor Options
 
@@ -202,51 +205,71 @@ interface Config {
 }
 ```
 
-### Methods
+Create a client instance:
 
-#### `purchase(request: PurchaseRequest): Promise<PurchaseData>`
-
-Create a standard purchase transaction.
-
-**Parameters:**
-- `invoice` (string): Unique invoice identifier
-- `invoiceDate` (string): Invoice date
-- `amount` (number): Amount in Rials
-- `callbackApi` (string): Callback URL for payment result
-- `mobileNumber` (string): Customer mobile number
-- `description` (string, optional): Transaction description
-- `payerMail` (string, optional): Customer email
-- `payerName` (string, optional): Customer name
-- `pans` (string[], optional): Allowed card numbers
-- `nationalCode` (string, optional): Customer national code
-- `paymentCode` (string, optional): Payment code
-
-**Returns:**
-```typescript
-{
-  urlId: string,  // Transaction URL ID (save for confirmation)
-  url: string     // Payment gateway URL (redirect user here)
-}
+```ts
+const client = new PepDorsa(config);
 ```
 
-#### `multiAccPurchase(request: MultiAccPurchaseRequest): Promise<PurchaseData>`
+### Exported types (short)
 
-Create a multi-account purchase transaction for splitting payments.
+- `PurchaseRequest` / `MultiAccPurchaseRequest` — standard and multi-account purchase payloads
+- `BillRequest` — bill payment payload
+- `DirectChargeRequest` / `PinChargeRequest` / `InternetChargeRequest` — mobile services
+- `PaymentRequest` — { invoice: string; urlId: string }
+- `PurchaseResponse`, `ConfirmResponse`, `SimpleResponse`, `ReverseResponse` — standard response shapes
+- `MobileOperator` — enum: `MCI`, `MTN`, `RTL`
 
-**Additional Parameters:**
-- `sharedValue` (string[]): Array of amounts to split
-- `sheba` (string[]): Array of SHEBA account numbers
+### MobileOperator
 
-#### `confirm(request: ConfirmRequest): Promise<ConfirmData>`
+Use the `MobileOperator` enum when calling mobile-related methods:
 
-Confirm a completed transaction.
+- `MobileOperator.MCI`
+- `MobileOperator.MTN`
+- `MobileOperator.RTL`
 
-**Parameters:**
-- `invoice` (string): Invoice identifier from purchase
-- `urlId` (string): URL ID from purchase response
+The client maps these to the gateway's service codes internally.
 
-**Returns:**
-```typescript
+### Methods
+
+All method signatures are on the `PepDorsa` instance. Common request fields include `invoice`, `invoiceDate`, `amount`, `callbackApi`, and `mobileNumber` where applicable.
+
+#### purchase(request: PurchaseRequest): Promise<{ urlId: string; url: string }>
+
+Create a standard purchase transaction. Returns `{ urlId, url }` where `url` is the payment redirect URL and `urlId` should be kept for confirmation.
+
+Key request fields (in addition to common ones):
+- `description?`, `payerMail?`, `payerName?`, `pans?`, `nationalCode?`, `paymentCode?`
+
+#### multiAccPurchase(request: MultiAccPurchaseRequest): Promise<{ urlId: string; url: string }>
+
+Create a multi-account purchase. Additional fields:
+- `sharedValue: string[]` — array of split amounts (rials or percentages as required by gateway)
+- `sheba: string[]` — target SHEBA accounts
+
+#### bill(request: BillRequest): Promise<string>
+
+Create a bill payment (pre-transaction). Returns a string token/identifier from the gateway on success.
+
+Required extra fields: `billId`, `paymentId`.
+
+#### directCharge(request: DirectChargeRequest): Promise<string>
+
+Request a direct mobile charge. Provide `operator: MobileOperator`. Returns a string result from the gateway on success.
+
+#### pinCharge(request: PinChargeRequest): Promise<string>
+
+Purchase mobile PIN codes. `count` controls number of PINs returned.
+
+#### internetCharge(request: InternetChargeRequest): Promise<string>
+
+Purchase internet/data packages. Provide `productCode` identifying the package.
+
+#### confirm(request: PaymentRequest): Promise<ConfirmResponse['data']>
+
+Confirm a completed transaction after the user returns to your `callbackApi`. Returns detailed confirmation data:
+
+```ts
 {
   invoice: string,
   referenceNumber: string,
@@ -257,6 +280,23 @@ Confirm a completed transaction.
   amount: number
 }
 ```
+
+#### verifyTransaction(request: PaymentRequest): Promise<SimpleResponse>
+
+Verify the transaction status (returns the gateway's `SimpleResponse` shape).
+
+#### verify(request: PaymentRequest): Promise<ConfirmResponse | SimpleResponse>
+
+Another verification endpoint that returns detailed or simple response depending on the gateway response.
+
+#### reverse(request: PaymentRequest): Promise<ReverseResponse>
+
+Reverse (refund) a transaction. Returns `ReverseResponse` with `resultCode` and `resultMsg`.
+
+### Authentication and token caching
+
+The client handles authentication automatically via `authenticate()` and caches the token in-memory. If the remote response does not provide an expire time, a 5-minute fallback cache is used.
+
 
 ## Error Handling
 
