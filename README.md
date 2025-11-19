@@ -66,11 +66,11 @@ For splitting payments across multiple accounts:
 ```typescript
 const multiAccResult = await pepClient.multiAccPurchase({
   invoice: 'INV-002',
-  invoiceDate: '2024-01-15',
+  invoiceDate: '1404/08/28',
   amount: 200000,
   callbackApi: 'https://yoursite.com/payment/callback',
   mobileNumber: '09123456789',
-  sharedValue: ['100000', '100000'], // Split amounts
+  sharedValue: ['100000', '100000'], // Split amounts in Rials or percentages
   sheba: ['IR123...', 'IR456...'],   // SHEBA account numbers
   description: 'Multi-account purchase',
   payerMail: 'customer@example.com',
